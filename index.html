@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>Document</title>
+</head>
+<script src="js/jquery-2.1.0.js"></script>
+
+<style type="text/css">
+	.box{
+		width: 500px;
+		height: 500px;
+		background: red;
+		shape-outside:circle();
+		float: left;
+	}
+</style>
+<body>
+	
+
+	<!--<form action="http://localhost/thinkphp/index.php/Home/index/pload" enctype="multipart/form-data" method="post" >-->
+		<!--<input type='file'  name='file[]' multiple="multiple" >-->
+		<!--<input type='file'  name='photo[]'>-->
+		<!--<input type='file'  name='photo[]'>-->
+		<!--<input type="submit" value="提交" >-->
+	<!--</form>-->
+	
+	<!--<form id="f" enctype="multipart/form-data">
+        UserName:<input type="text" name="userName"><br/>
+        File1:<input type="file" name="file[]"><br/>
+        File2:<input type="file" name="file[]"><br/>
+        <input type="button" id="btn" value="提交">
+    </form>-->
+    
+    <form id="f">
+    	 <label>
+	        <li >
+	            <div class="shcph" id="fileList0">
+	                <img src="img/banner.jpg" style="width: 60px;height: 60px;">
+	            </div>
+	            <input  type="file" accept="image/*" name="return_imgs[]"  onchange="handleFiles(this,0)" style="display:none">
+	        </li>
+	    </label>
+	    <label>
+	        <li class="file">
+	            <div class="shcph" id="fileList1">
+	              <img src="img/banner.jpg" style="width: 60px;height: 60px;">
+	            </div>
+	            <input  type="file" accept="image/*" name="return_imgs[]"  onchange="handleFiles(this,1)" style="display:none">
+	        </li>
+	    </label>
+	     <label>
+	        <li class="file">
+	            <div class="shcph" id="fileList2">
+	              <img src="img/banner.jpg" style="width: 60px;height: 60px;">
+	            </div>
+	            <input  type="file" accept="image/*" name="return_imgs[]"  onchange="handleFiles(this,2)" style="display:none">
+	        </li>
+	    </label>
+	    <input type="button" id="btn" value="提交">
+    </form>
+</body>
+<script>
+//	var detail= [];
+//	detail.push({ ticket_type_id: 1 ,count: 2},{ ticket_type_id: 2, count: 4});
+//	console.log(detail[0]['ticket_type_id']);
+//	var obj = { ticket_type_id: 1 ,count: 2};
+////	param.append("name","lisi");
+//	$.post("https://mall.sxzhwts.com/api/user/user_address_detail",{
+//		detail:obj
+//	},function(){
+//		
+//	},'json')
+$("#btn").on("click",function () {
+    //使用FormData对象来提交整个表单，它支持文件的上传
+    var formData=new FormData(document.getElementById("f"));
+    //额外带来一些数据
+    formData.append("age",14);
+    console.log(formData);
+//  return false;
+    //使用ajax提交
+    $.ajax("http://localhost/thinkphp/index.php/Home/index/pload",{
+        type:"post",
+        data:formData,
+        processData:false,//告诉jquery不要去处理请求的数据格式
+        contentType:false,//告诉jquery不要设置请求头的类型
+        success:function (data) {
+            alert(data);
+        }
+    });
+})
+//$.ajax({
+//	type:"post",
+//	url:"http://172.16.22.148:8080/zhwts_shop/public/index.php/api/Home/hot_recommended/",
+//	async:true,
+//	dataType:'json',
+//	success:function(res){
+//		console.log(res);
+//	}
+//});
+
+    //上传照片
+    window.URL = window.URL || window.webkitURL;
+    function handleFiles(obj,id) {
+        fileList = document.getElementById("fileList"+id);
+        var files = obj.files;
+        img = new Image();
+        if(window.URL){
+
+            img.src = window.URL.createObjectURL(files[0]); //创建一个object URL，并不是你的本地路径
+            img.width = 60;
+            img.height = 60;
+            img.onload = function(e) {
+                window.URL.revokeObjectURL(this.src); //图片加载后，释放object URL
+            }
+            if(fileList.firstElementChild){
+                fileList.removeChild(fileList.firstElementChild);
+            }
+            fileList.appendChild(img);
+        }else if(window.FileReader){
+            //opera不支持createObjectURL/revokeObjectURL方法。我们用FileReader对象来处理
+            var reader = new FileReader();
+            reader.readAsDataURL(files[0]);
+            reader.onload = function(e){
+                img.src = this.result;
+                img.width = 60;
+                img.height = 60;
+                fileList.appendChild(img);
+            }
+        }else
+        {
+            //ie
+            obj.select();
+            obj.blur();
+            var nfile = document.selection.createRange().text;
+            document.selection.empty();
+            img.src = nfile;
+            img.width = 60;
+            img.height = 60;
+            img.onload=function(){
+
+            }
+            fileList.appendChild(img);
+        }
+    }
+</script>
+</html>
